@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Material académico interactivo sobre fusión de datos espaciales y no espaciales en QGIS.">
+  <title>Fusión de datos espaciales y no espaciales en QGIS</title>
+  <style>
+    :root{
+      --primary:#194d33;
+      --primary2:#2f6f4e;
+      --accent:#3a86ff;
+      --bg:#f5f8f6;
+      --surface:#ffffff;
+      --text:#1f2937;
+      --muted:#64748b;
+      --border:#d9e4dd;
+      --success:#166534;
+      --successbg:#dcfce7;
+      --danger:#991b1b;
+      --dangerbg:#fee2e2;
+      --warning:#92400e;
+      --warningbg:#fff7ed;
+      --shadow:0 10px 25px rgba(15,23,42,.08);
+      --radius:16px;
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.65;
+    }
+    .top{
+      position:sticky;
+      top:0;
+      z-index:999;
+      background:rgba(25,77,51,.96);
+      box-shadow:0 4px 16px rgba(0,0,0,.12);
+    }
+    nav{
+      max-width:var(--max);
+      margin:auto;
+      padding:12px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+    }
+    .brand{
+      color:white;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .navlinks{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      justify-content:flex-end;
+    }
+    .navlinks a{
+      color:#ecfdf5;
+      text-decoration:none;
+      padding:7px 10px;
+      border-radius:9px;
+      font-size:.9rem;
+    }
+    .navlinks a:hover{background:rgba(255,255,255,.12)}
+
+    .hero{
+      background:linear-gradient(135deg,#194d33 0%,#2f6f4e 55%,#2f80ed 100%);
+      color:white;
+      padding:62px 20px 50px;
+    }
+    .hero-inner{
+      max-width:var(--max);
+      margin:auto;
+      display:grid;
+      grid-template-columns:1.45fr .8fr;
+      gap:28px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-block;
+      padding:6px 10px;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.12);
+      border-radius:999px;
+      font-size:.85rem;
+      margin-bottom:12px;
+    }
+    h1{
+      font-size:clamp(2rem,5vw,3.5rem);
+      line-height:1.08;
+      margin:0 0 14px;
+    }
+    .hero p{color:#e8f7ef;max-width:760px}
+    .hero-box{
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:17px;
+      padding:18px;
+    }
+    .hero-box strong{display:block;margin-bottom:8px}
+    .hero-box ul{padding-left:20px;margin:0}
+
+    main{
+      max-width:var(--max);
+      margin:auto;
+      padding:32px 20px 70px;
+    }
+    section{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:26px;
+      margin-bottom:24px;
+      scroll-margin-top:90px;
+    }
+    h2{margin-top:0;color:var(--primary);font-size:1.55rem}
+    h3{color:var(--primary2);margin-bottom:8px}
+    .lead{color:var(--muted);margin-top:-6px}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .card{
+      border:1px solid var(--border);
+      border-radius:13px;
+      padding:17px;
+      background:#fbfefc;
+    }
+    .step{
+      display:grid;
+      grid-template-columns:44px 1fr;
+      gap:14px;
+      align-items:start;
+      margin:14px 0;
+    }
+    .num{
+      width:38px;
+      height:38px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      background:var(--primary);
+      color:white;
+      font-weight:800;
+    }
+    .callout{
+      margin:16px 0;
+      padding:15px 17px;
+      border-left:5px solid var(--accent);
+      background:#eff6ff;
+      border-radius:10px;
+    }
+    .warn{
+      background:var(--warningbg);
+      border-left-color:#f59e0b;
+      color:#78350f;
+    }
+    .ok{
+      background:#ecfdf5;
+      border-left-color:#10b981;
+      color:#065f46;
+    }
+    code{
+      background:#eef2f7;
+      padding:2px 6px;
+      border-radius:6px;
+      color:#0f172a;
+    }
+    pre{
+      background:#111827;
+      color:#f8fafc;
+      padding:15px;
+      border-radius:12px;
+      overflow:auto;
+      font-size:.92rem;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:12px;
+      min-width:720px;
+    }
+    th,td{
+      border:1px solid var(--border);
+      padding:10px 11px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{background:#edf5f0;color:var(--primary)}
+    .table-wrap{overflow-x:auto}
+    .btnrow{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:11px 16px;
+      border-radius:10px;
+      border:none;
+      text-decoration:none;
+      cursor:pointer;
+      color:white;
+      background:var(--primary);
+      font-weight:750;
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .btn.blue{background:#2563eb}
+    .btn.light{background:#e7efe9;color:var(--primary)}
+    .quizq{
+      border:1px solid var(--border);
+      border-radius:13px;
+      padding:16px;
+      margin:13px 0;
+      background:#fbfefc;
+    }
+    .quizq p{font-weight:700;margin-top:0}
+    .option{
+      display:block;
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .option:hover{background:#eef5f1}
+    .option input{margin-right:8px}
+    #result{
+      display:none;
+      margin-top:16px;
+      padding:15px;
+      border-radius:11px;
+      font-weight:700;
+    }
+    #result.good{display:block;background:var(--successbg);color:var(--success)}
+    #result.bad{display:block;background:var(--dangerbg);color:var(--danger)}
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:20px 20px 45px;
+    }
+    @media(max-width:900px){
+      .hero-inner,.grid2{grid-template-columns:1fr}
+      .navlinks{display:none}
+    }
+    @media print{
+      .top,.btnrow{display:none!important}
+      body{background:white}
+      section{box-shadow:none;break-inside:avoid}
+      .hero{background:white;color:#111;padding:20px}
+      .hero p{color:#444}
+    }
+  </style>
+</head>
+<body>
+
+<header class="top">
+  <nav>
+    <div class="brand">QGIS · Datos espaciales</div>
+    <div class="navlinks">
+      <a href="#teoria">Conceptos</a>
+      <a href="#preparacion">Preparación</a>
+      <a href="#union">Unión</a>
+      <a href="#verificacion">Verificación</a>
+      <a href="#area">Área y densidad</a>
+      <a href="#ejemplo">Ejemplo</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#quiz">Repaso</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow">Curso: Desarrollo Territorial / SIG</span>
+      <h1>Fusión de datos espaciales y no espaciales en QGIS</h1>
+      <p>
+        Guía práctica para unir una capa espacial <strong>GeoPackage (.gpkg)</strong>
+        con una tabla <strong>CSV</strong> mediante el código <strong>UBIGEO</strong>,
+        verificar la unión y calcular indicadores como área y densidad poblacional.
+      </p>
+    </div>
+    <div class="hero-box">
+      <strong>Objetivos de aprendizaje</strong>
+      <ul>
+        <li>Diferenciar datos espaciales y no espaciales.</li>
+        <li>Preparar correctamente el campo UBIGEO.</li>
+        <li>Realizar una unión de atributos en QGIS.</li>
+        <li>Detectar problemas de coincidencia.</li>
+        <li>Calcular área en km² y densidad poblacional.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<section id="teoria">
+  <h2>1. Marco teórico</h2>
+  <p class="lead">Conceptos básicos necesarios antes de realizar una fusión.</p>
+
+  <div class="grid2">
+    <article class="card">
+      <h3>Datos espaciales</h3>
+      <p>
+        Son datos que contienen una geometría asociada a una ubicación geográfica:
+        <strong>puntos, líneas o polígonos</strong>. En este caso, un archivo
+        <code>.gpkg</code> puede contener los límites de los distritos del Perú.
+      </p>
+    </article>
+
+    <article class="card">
+      <h3>Datos no espaciales</h3>
+      <p>
+        Son tablas que contienen atributos pero no geometría. Por ejemplo, un
+        archivo <code>.csv</code> con población, pobreza, ingreso o número de viviendas
+        por distrito.
+      </p>
+    </article>
+  </div>
+
+  <div class="callout">
+    <strong>Principio clave:</strong> para fusionar ambos archivos debe existir una
+    variable común en las dos tablas. Para datos distritales del Perú, normalmente
+    se utiliza el <strong>UBIGEO</strong>.
+  </div>
+</section>
+
+<section id="preparacion">
+  <h2>2. Preparación de los archivos</h2>
+
+  <div class="step">
+    <div class="num">1</div>
+    <div>
+      <h3>Cargar el GeoPackage</h3>
+      <p>
+        En QGIS use <strong>Capa → Añadir capa → Añadir capa vectorial</strong>.
+        Seleccione el archivo <code>DISTRITO.gpkg</code>.
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">2</div>
+    <div>
+      <h3>Cargar el archivo CSV</h3>
+      <p>
+        Use <strong>Capa → Añadir capa → Añadir capa de texto delimitado</strong>.
+        Seleccione el archivo CSV.
+      </p>
+      <p>
+        Si el CSV no contiene coordenadas, marque la opción equivalente a
+        <strong>sin geometría / tabla solamente</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      <h3>Verificar el UBIGEO</h3>
+      <p>
+        El código UBIGEO debe tener el mismo formato en ambos archivos.
+        Para distritos normalmente tiene <strong>6 caracteres</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Problema frecuente:</strong> Excel elimina los ceros iniciales.
+    Por ejemplo, <code>010101</code> puede convertirse en <code>10101</code>.
+    En ese caso la unión no encontrará coincidencias.
+  </div>
+
+  <h3>Cómo corregir UBIGEO en Excel</h3>
+  <p>Si el UBIGEO está en la celda A2, cree una nueva columna y use:</p>
+  <pre>=TEXTO(A2;"000000")</pre>
+  <p>
+    Luego copie la columna y use <strong>Pegado especial → Valores</strong>,
+    guarde nuevamente como CSV y vuelva a cargarlo en QGIS.
+  </p>
+</section>
+
+<section id="union">
+  <h2>3. Fusión mediante unión de atributos</h2>
+  <p class="lead">Este es el procedimiento recomendado desde las propiedades de la capa espacial.</p>
+
+  <div class="step">
+    <div class="num">1</div>
+    <div>
+      <strong>Clic derecho sobre la capa DISTRITO</strong> → <strong>Propiedades</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">2</div>
+    <div>
+      Seleccione la pestaña <strong>Uniones</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      Presione el botón <strong>+</strong> para agregar una nueva unión.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">4</div>
+    <div>
+      Configure:
+      <ul>
+        <li><strong>Capa de unión:</strong> archivo CSV.</li>
+        <li><strong>Campo de unión:</strong> UBIGEO del CSV.</li>
+        <li><strong>Campo objetivo:</strong> UBIGEO de la capa espacial.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">5</div>
+    <div>
+      Pulse <strong>Aceptar</strong> y abra la tabla de atributos de la capa espacial.
+    </div>
+  </div>
+
+  <div class="callout ok">
+    Si la unión fue correcta, en la tabla del GeoPackage aparecerán nuevas columnas
+    provenientes del CSV, por ejemplo <strong>población</strong>, pobreza u otros indicadores.
+  </div>
+</section>
+
+<section id="verificacion">
+  <h2>4. Verificación de la unión</h2>
+
+  <div class="grid2">
+    <article class="card">
+      <h3>Comprobar coincidencias</h3>
+      <p>
+        Revise varios distritos conocidos. Las variables del CSV no deben aparecer como
+        <code>NULL</code> si existe un UBIGEO coincidente.
+      </p>
+    </article>
+    <article class="card">
+      <h3>Revisar tipo de dato</h3>
+      <p>
+        Es preferible que ambos campos UBIGEO sean texto. Si uno es entero y el otro texto,
+        pueden producirse problemas de comparación.
+      </p>
+    </article>
+  </div>
+
+  <div class="callout warn">
+    Si muchos registros aparecen como <strong>NULL</strong>, revise:
+    longitud del UBIGEO, ceros iniciales, espacios, duplicados y nombres de campo.
+  </div>
+</section>
+
+<section id="area">
+  <h2>5. Cálculo del área y densidad poblacional</h2>
+
+  <h3>¿Por qué no aparece una columna “área”?</h3>
+  <p>
+    En muchas capas espaciales el área no está almacenada como un atributo visible.
+    QGIS puede calcularla directamente desde la geometría del polígono.
+  </p>
+
+  <h3>Crear el área en km²</h3>
+  <div class="step">
+    <div class="num">1</div>
+    <div>Abra la <strong>tabla de atributos</strong>.</div>
+  </div>
+  <div class="step">
+    <div class="num">2</div>
+    <div>Pulse <strong>Calculadora de campos</strong>.</div>
+  </div>
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      Cree un nuevo campo decimal llamado <code>area_km2</code>.
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">4</div>
+    <div>
+      Use la expresión:
+      <pre>$area / 1000000</pre>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Importante:</strong> esta fórmula es correcta cuando la capa está en un
+    sistema de coordenadas proyectado cuya unidad es el metro.
+    Si la capa está en coordenadas geográficas (grados), debe reproyectarse antes.
+  </div>
+
+  <h3>Calcular densidad poblacional</h3>
+  <p>
+    Si la población está en un campo llamado <code>poblacion</code> y ya existe
+    <code>area_km2</code>, cree otro campo decimal:
+  </p>
+  <pre>"poblacion" / "area_km2"</pre>
+
+  <p>La unidad resultante será:</p>
+  <p><strong>habitantes por km²</strong>.</p>
+</section>
+
+<section id="ejemplo">
+  <h2>6. Ejemplo aplicado</h2>
+  <p class="lead">Integración de población distrital con límites geográficos.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>UBIGEO</th>
+          <th>Distrito</th>
+          <th>Población</th>
+          <th>Área (km²)</th>
+          <th>Densidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ejemplo</td>
+          <td>Distrito A</td>
+          <td>42 000</td>
+          <td>210</td>
+          <td>200 hab./km²</td>
+        </tr>
+        <tr>
+          <td>Ejemplo</td>
+          <td>Distrito B</td>
+          <td>18 000</td>
+          <td>450</td>
+          <td>40 hab./km²</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    La densidad permite comparar la concentración de población entre distritos
+    con extensiones territoriales diferentes.
+  </div>
+</section>
+
+<section id="errores">
+  <h2>7. Errores frecuentes</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Problema</th>
+          <th>Causa probable</th>
+          <th>Solución</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Campos unidos aparecen NULL</td>
+          <td>UBIGEO no coincide</td>
+          <td>Revisar longitud, ceros iniciales y tipo de dato.</td>
+        </tr>
+        <tr>
+          <td>Área demasiado pequeña</td>
+          <td>CRS incorrecto o geometría problemática</td>
+          <td>Revisar CRS, reproyectar y validar geometrías.</td>
+        </tr>
+        <tr>
+          <td>UBIGEO perdió el cero inicial</td>
+          <td>Excel lo interpretó como número</td>
+          <td>Usar TEXTO(A2;"000000") y guardar como texto.</td>
+        </tr>
+        <tr>
+          <td>La tabla CSV no aparece en el mapa</td>
+          <td>No tiene geometría</td>
+          <td>Es normal: se utiliza como tabla para la unión.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="recursos">
+  <h2>8. Recursos</h2>
+  <p class="lead">Enlaces editables para incorporar bases de datos y prácticas.</p>
+  <div class="btnrow">
+    <a class="btn" href="https://www.inei.gob.pe/" target="_blank" rel="noopener noreferrer">
+      📊 INEI
+    </a>
+    <a class="btn blue" href="https://qgis.org/" target="_blank" rel="noopener noreferrer">
+      🗺️ QGIS
+    </a>
+    <button class="btn light" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+</section>
+
+<section id="quiz">
+  <h2>9. Preguntas de repaso</h2>
+  <p class="lead">Seleccione una respuesta en cada pregunta y pulse “Calificar”.</p>
+
+  <form id="quizForm"></form>
+
+  <div class="btnrow">
+    <button type="button" class="btn" onclick="grade()">Calificar</button>
+    <button type="button" class="btn light" onclick="resetQuiz()">Reiniciar</button>
+  </div>
+
+  <div id="result" aria-live="polite"></div>
+</section>
+
+<section id="conclusiones">
+  <h2>10. Conclusiones</h2>
+  <ol>
+    <li>La unión de datos espaciales y no espaciales requiere una variable común y consistente.</li>
+    <li>El UBIGEO es un identificador adecuado para integrar información territorial del Perú.</li>
+    <li>Los ceros iniciales y el tipo de dato del UBIGEO deben verificarse antes de realizar la unión.</li>
+    <li>QGIS puede calcular el área directamente desde la geometría, aunque no exista un campo de área en la tabla.</li>
+    <li>La densidad poblacional se obtiene dividiendo la población entre el área expresada en km².</li>
+  </ol>
+</section>
+
+<section id="referencias">
+  <h2>11. Referencias</h2>
+  <p>
+    QGIS Development Team. <em>QGIS Geographic Information System</em>.
+  </p>
+  <p>
+    Instituto Nacional de Estadística e Informática del Perú. Información estadística y cartográfica.
+  </p>
+  <p>
+    Longley, P. A., Goodchild, M. F., Maguire, D. J., & Rhind, D. W.
+    <em>Geographic Information Science and Systems</em>.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  Material académico interactivo sobre integración de datos espaciales y no espaciales en QGIS.
+</footer>
+
+<script>
+const questions = [
+  {
+    q:"1. ¿Qué tipo de archivo contiene geometría espacial?",
+    o:["CSV sin coordenadas","GeoPackage","TXT simple","Documento Word"],
+    c:1
+  },
+  {
+    q:"2. ¿Qué campo se utiliza frecuentemente para unir información distrital en Perú?",
+    o:["DNI","RUC","UBIGEO","Latitud"],
+    c:2
+  },
+  {
+    q:"3. ¿Cuántos caracteres tiene normalmente el UBIGEO distrital?",
+    o:["4","5","6","8"],
+    c:2
+  },
+  {
+    q:"4. ¿Qué ocurre si Excel elimina el cero inicial del UBIGEO?",
+    o:["No afecta la unión","Puede impedir la coincidencia","QGIS lo corrige siempre","Convierte el CSV en GeoPackage"],
+    c:1
+  },
+  {
+    q:"5. ¿Dónde se configura una unión de atributos en QGIS?",
+    o:["Propiedades de la capa → Uniones","Diseñador de impresión","Administrador de estilos","Complementos"],
+    c:0
+  },
+  {
+    q:"6. ¿Qué significa NULL después de una unión?",
+    o:["Siempre existe coincidencia","No se encontró valor correspondiente o el dato está vacío","El archivo está dañado","El mapa fue reproyectado"],
+    c:1
+  },
+  {
+    q:"7. ¿Qué expresión permite obtener área en km² si la geometría está en metros?",
+    o:["$area * 1000000","$area / 1000000","$length / 1000","area() * 100"],
+    c:1
+  },
+  {
+    q:"8. ¿Qué debe revisarse antes de calcular área?",
+    o:["Color del mapa","Sistema de coordenadas","Nombre del proyecto","Tamaño de letra"],
+    c:1
+  },
+  {
+    q:"9. ¿Cómo se calcula la densidad poblacional?",
+    o:["Área / población","Población × área","Población / área","Población + área"],
+    c:2
+  },
+  {
+    q:"10. ¿Cuál es la unidad usual de densidad poblacional?",
+    o:["km² por habitante","habitantes por km²","metros por habitante","porcentaje"],
+    c:1
+  }
+];
+
+function renderQuiz(){
+  const f=document.getElementById("quizForm");
+  f.innerHTML="";
+  questions.forEach((x,i)=>{
+    const d=document.createElement("div");
+    d.className="quizq";
+    const p=document.createElement("p");
+    p.textContent=x.q;
+    d.appendChild(p);
+    x.o.forEach((opt,j)=>{
+      const l=document.createElement("label");
+      l.className="option";
+      l.innerHTML=`<input type="radio" name="q${i}" value="${j}"> ${opt}`;
+      d.appendChild(l);
+    });
+    f.appendChild(d);
+  });
+}
+
+function grade(){
+  let score=0, answered=0;
+  questions.forEach((x,i)=>{
+    const s=document.querySelector(`input[name="q${i}"]:checked`);
+    if(s){
+      answered++;
+      if(Number(s.value)===x.c) score++;
+    }
+  });
+  const pct=Math.round(score/questions.length*100);
+  const r=document.getElementById("result");
+  r.className=pct>=60?"good":"bad";
+  r.innerHTML=`Puntaje: ${score}/${questions.length} (${pct}%).<br>
+  Respondidas: ${answered}/${questions.length}.<br>
+  ${pct>=60?"Resultado satisfactorio.":"Revise nuevamente el procedimiento de unión, UBIGEO y cálculo de área."}`;
+}
+
+function resetQuiz(){
+  document.getElementById("quizForm").reset();
+  const r=document.getElementById("result");
+  r.className="";
+  r.style.display="none";
+  r.innerHTML="";
+}
+
+window.addEventListener("DOMContentLoaded",renderQuiz);
+</script>
+
+</body>
+</html>
